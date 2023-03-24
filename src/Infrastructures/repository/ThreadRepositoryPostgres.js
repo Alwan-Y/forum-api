@@ -22,7 +22,6 @@ class ThreadRepositoryPostgres extends ThreadRepository {
   }
 
   async checkThreadByTitle(title) {
-    console.log('masuk inis')
     const query = {
       text: 'SELECT title FROM threads WHERE title = $1',
       values: [title],

@@ -16,7 +16,6 @@ class ThreadHandler {
 
     console.log(threadPayload);
     const addedThread = await addThreadUseCase.execute(threadPayload);
-    console.log(addThreadUseCase, 'zzzzz');
 
     const response = h.response({
       status: 'success',

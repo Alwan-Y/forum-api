@@ -59,7 +59,7 @@ describe('ThreadRepository postgres', () => {
     });
   });
 
-  describe('checkThreadByTittle function', () => {
+  describe('checkThreadByTitle function', () => {
     it('should throw InvariantError when thread tittle exist', async () => {
       // Arrange
       await UsersTableTestHelper.addUser({ id: 'user-123' });

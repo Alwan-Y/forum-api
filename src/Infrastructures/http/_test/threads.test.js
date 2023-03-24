@@ -56,7 +56,6 @@ describe('/threads endpoint', () => {
       });
 
       const responseJson = JSON.parse(response.payload);
-      console.log(responseJson, 'zzzzz31');
       await expect(response.statusCode).toEqual(201);
       await expect(responseJson.status).toEqual('success');
       await expect(responseJson.data.addedThread.id).toBeDefined();

@@ -71,7 +71,8 @@ class CommentRepositoryPostgres extends CommentRepository {
       comment_threads.is_delete, users.username, comment_threads.created_at as date
       FROM comment_threads
       LEFT JOIN users ON comment_threads.owner = users.id
-      WHERE comment_threads.thread_id = $1`,
+      WHERE comment_threads.thread_id = $1
+      order by comment_threads.created_at`,
       values: [threadId],
     };
 

@@ -95,6 +95,7 @@ describe('ThreadRepository postgres', () => {
         title: 'Backend Expert',
         body: 'How To Learn Backend Expert',
         username: 'dicoding',
+        date: expect.anything(),
       });
     });
 

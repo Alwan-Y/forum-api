@@ -4,8 +4,8 @@ describe('a GetThread', () => {
   it('should throw error when not contain detail thread property', () => {
     // Arrange
     const payload = {
-      id: 'thread-123',
-      title: 'test thread',
+      id: 'new-thread',
+      title: 'test-get-thread',
     };
 
     // Action and Assert
@@ -16,9 +16,9 @@ describe('a GetThread', () => {
     // Arrange
     const payload = {
       id: 123,
-      title: 'test thread',
-      body: 'test body',
-      date: '2020-01-01',
+      title: 'test-get-thread',
+      body: 'test-body',
+      date: '2023-01-01',
       username: 'test user',
       comments: [],
     };
@@ -30,11 +30,11 @@ describe('a GetThread', () => {
   it('should create GetThread entities correctly', () => {
     // Arrange
     const payload = {
-      id: 'thread-123',
-      title: 'test thread',
-      body: 'test body',
-      date: '2020-01-01',
-      username: 'test user',
+      id: 'new-thread',
+      title: 'test-get-thread',
+      body: 'test-body',
+      date: '2023-01-01',
+      username: 'user-test',
       comments: [],
     };
 

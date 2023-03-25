@@ -1,6 +1,7 @@
 const pool = require('../../database/postgres/pool');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const ThreadTableTestHelper = require('../../../../tests/ThreadTableTestHelper');
+const CommentTableTestHelper = require('../../../../tests/CommentTableTestHelper');
 const container = require('../../container');
 const createServer = require('../createServer');
 
@@ -60,6 +61,48 @@ describe('/threads endpoint', () => {
       await expect(responseJson.data.addedThread.id).toBeDefined();
       await expect(responseJson.data.addedThread.title).toEqual('thread title');
       await expect(responseJson.data.addedThread.owner).toEqual(id);
+    });
+  });
+
+  describe('when GET /threads/{id}', () => {
+    it('should response detail thread with comments without authentication', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({
+        username: 'dicodingcom',
+        id: 'dicodingcom-id',
+      });
+      await ThreadTableTestHelper.addThread({
+        id: 'thread-xx-122',
+        title: 'thread title',
+        body: 'thread body',
+        owner: 'dicodingcom-id',
+      });
+      await CommentTableTestHelper.addComment({
+        id: 'comment-xx-122',
+        content: 'comment content',
+        threadId: 'thread-xx-122',
+        userId: 'dicodingcom-id',
+      });
+      const server = await createServer(container);
+
+      // Action
+      const response = await server.inject({
+        method: 'GET',
+        url: '/threads/thread-xx-122',
+      });
+
+      const responseJson = JSON.parse(response.payload);
+      await expect(response.statusCode).toEqual(200);
+      await expect(responseJson.status).toEqual('success');
+      await expect(responseJson.data.thread.id).toEqual('thread-xx-122');
+      await expect(responseJson.data.thread.title).toEqual('thread title');
+      await expect(responseJson.data.thread.body).toEqual('thread body');
+      await expect(responseJson.data.thread.username).toEqual('dicodingcom');
+      await expect(responseJson.data.thread.comments).toBeDefined();
+      await expect(responseJson.data.thread.comments.length).toEqual(1);
+      await expect(responseJson.data.thread.comments[0].id).toEqual('comment-xx-122');
+      await expect(responseJson.data.thread.comments[0].content).toEqual('comment content');
+      await expect(responseJson.data.thread.comments[0].username).toEqual('dicodingcom');
     });
   });
 });

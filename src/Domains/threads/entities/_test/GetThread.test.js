@@ -2,15 +2,18 @@ const GetThread = require('../GetThread');
 
 describe('a GetThread', () => {
   it('should throw error when not contain detail thread property', () => {
+    // Arrange
     const payload = {
       id: 'thread-123',
       title: 'test thread',
     };
 
+    // Action and Assert
     expect(() => new GetThread(payload)).toThrowError('GET_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
   });
 
   it('should throw error when not meet data type specification', () => {
+    // Arrange
     const payload = {
       id: 123,
       title: 'test thread',
@@ -20,10 +23,12 @@ describe('a GetThread', () => {
       comments: [],
     };
 
+    // Action and Assert
     expect(() => new GetThread(payload)).toThrowError('GET_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should create GetThread entities correctly', () => {
+    // Arrange
     const payload = {
       id: 'thread-123',
       title: 'test thread',
@@ -33,8 +38,10 @@ describe('a GetThread', () => {
       comments: [],
     };
 
+    // Action
     const getThread = new GetThread(payload);
 
+    // Assert
     expect(getThread).toBeInstanceOf(GetThread);
     expect(getThread.id).toEqual(payload.id);
     expect(getThread.title).toEqual(payload.title);

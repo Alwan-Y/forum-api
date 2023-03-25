@@ -41,7 +41,6 @@ describe('/threads endpoint', () => {
       const { accessToken } = await user.result.data;
       const { id } = await addUser.result.data.addedUser;
 
-      console.log(accessToken, id, 'zzzz');
       // Action
       const response = await server.inject({
         method: 'POST',

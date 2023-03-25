@@ -14,7 +14,6 @@ class ThreadHandler {
       owner: request.auth.credentials.id,
     };
 
-    console.log(threadPayload);
     const addedThread = await addThreadUseCase.execute(threadPayload);
 
     const response = h.response({

@@ -7,7 +7,6 @@ const RepliesRepositoryPostgres = require('../RepliesRepositoryPostgres');
 const AddedReplies = require('../../../Domains/replies/entities/AddedReplies');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
-const InvariantError = require('../../../Commons/exceptions/InvariantError');
 
 describe('RepliesRepositoryPostgres', () => {
   afterEach(async () => {
@@ -159,12 +158,14 @@ describe('RepliesRepositoryPostgres', () => {
   });
 
   describe('findRepliesByCommentId function', () => {
-    it('should return InvariantErorr if replies not found', async () => {
+    it('should return Array null if replies not found', async () => {
       // Arrange
       const repliesRepositoryPostgres = new RepliesRepositoryPostgres(pool, {});
 
+      const result = await repliesRepositoryPostgres.findRepliesByCommentId('comment-123');
+
       // Action & Assert
-      await expect(repliesRepositoryPostgres.findRepliesByCommentId('comment-123')).rejects.toThrowError(InvariantError);
+      await expect(result).toEqual([]);
     });
 
     it('should return replies correctly', async () => {

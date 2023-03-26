@@ -1,6 +1,5 @@
 const AddedReplies = require('../../Domains/replies/entities/AddedReplies');
 const RepliesRepository = require('../../Domains/replies/RepliesRepository');
-const InvariantError = require('../../Commons/exceptions/InvariantError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 
@@ -66,7 +65,14 @@ class RepliesRepositoryPostgres extends RepliesRepository {
   async findRepliesByCommentId(commentId) {
     const query = {
       text: `
-        SELECT replies.id, replies.content, replies.created_at as date, users.username
+        SELECT 
+          replies.id, 
+          replies.created_at as date, 
+          case 
+              when replies.is_delete = true then '**balasan telah dihapus**'
+              when replies.is_delete = false then replies.content
+          end as content,
+          users.username
         FROM replies
         LEFT JOIN users ON users.id = replies.owner
         WHERE replies.comment_id = $1
@@ -76,10 +82,6 @@ class RepliesRepositoryPostgres extends RepliesRepository {
     };
 
     const result = await this._pool.query(query);
-
-    if (!result.rowCount) {
-      throw new InvariantError('replies tidak ditemukan');
-    }
 
     return result.rows;
   }

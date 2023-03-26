@@ -1,9 +1,10 @@
 const GetThread = require('../../Domains/threads/entities/GetThread');
 
 class GetDetailThreadUseCase {
-  constructor({ threadRepository, commentRepository }) {
+  constructor({ threadRepository, commentRepository, repliesRepository }) {
     this._threadRepository = threadRepository;
     this._commentRepository = commentRepository;
+    this._repliesRepository = repliesRepository;
   }
 
   async execute(payload) {
@@ -51,13 +52,25 @@ class GetDetailThreadUseCase {
     return result;
   }
 
+  // async _commentsMapping(comments) {
+  //   return comments.map((comment) => ({
+  //     id: comment.id,
+  //     content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
+  //     date: comment.date,
+  //     username: comment.username,
+  //   }));
+  // }
+
   async _commentsMapping(comments) {
-    return comments.map((comment) => ({
+    const commentPromises = comments.map(async (comment) => ({
       id: comment.id,
       content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
       date: comment.date,
       username: comment.username,
+      replies: await this._repliesRepository.findRepliesByCommentId(comment.id),
     }));
+
+    return Promise.all(commentPromises);
   }
 }
 

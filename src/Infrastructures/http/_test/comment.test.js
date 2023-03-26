@@ -21,20 +21,20 @@ describe('/threads/{id}/comments endpoint', () => {
       // Arrange
       await UsersTableTestHelper.addUser({
         username: 'usernameforcomment',
-        id: 'user-0000',
+        id: 'user-123',
       });
       await ThreadTableTestHelper.addThread({
-        id: 'thread-1221',
+        id: 'thread-123',
         title: 'thread title',
         body: 'thread body',
-        owner: 'user-0000',
+        owner: 'user-123',
       });
       const server = await createServer(container);
 
       // Action
       const response = await server.inject({
         method: 'POST',
-        url: '/threads/thread-1221/comments',
+        url: '/threads/thread-123/comments',
         payload: {
           content: 'comment content',
         },
@@ -50,12 +50,12 @@ describe('/threads/{id}/comments endpoint', () => {
     it('should response 404 if thread not found', async () => {
       // Arrange
       const server = await createServer(container);
-      // add user
+
       await server.inject({
         method: 'POST',
         url: '/users',
         payload: {
-          username: 'dicodingxyuda',
+          username: 'testusername',
           password: 'secret',
           fullname: 'Dicoding Indonesia',
         },
@@ -65,7 +65,7 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/authentications',
         payload: {
-          username: 'dicodingxyuda',
+          username: 'testusername',
           password: 'secret',
         },
       });
@@ -98,7 +98,7 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/users',
         payload: {
-          username: 'dicodingxyudaa',
+          username: 'testusername',
           password: 'secret',
           fullname: 'Dicoding Indonesia',
         },
@@ -108,7 +108,7 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/authentications',
         payload: {
-          username: 'dicodingxyudaa',
+          username: 'testusername',
           password: 'secret',
         },
       });
@@ -150,7 +150,7 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/users',
         payload: {
-          username: 'dicodingxyudaaa',
+          username: 'testusername',
           password: 'secret',
           fullname: 'Dicoding Indonesia',
         },
@@ -160,7 +160,7 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/authentications',
         payload: {
-          username: 'dicodingxyudaaa',
+          username: 'testusername',
           password: 'secret',
         },
       });
@@ -169,7 +169,7 @@ describe('/threads/{id}/comments endpoint', () => {
 
       // add thread
       await ThreadTableTestHelper.addThread({
-        id: 'thread-xx-xx12',
+        id: 'thread-123',
         title: 'thread title',
         body: 'thread body',
         owner: id,
@@ -178,7 +178,7 @@ describe('/threads/{id}/comments endpoint', () => {
       // Action
       const response = await server.inject({
         method: 'POST',
-        url: '/threads/thread-xx-xx12/comments',
+        url: '/threads/thread-123/comments',
         payload: {
           content: 'comment content',
         },
@@ -202,27 +202,27 @@ describe('/threads/{id}/comments endpoint', () => {
     it('should response 401 and persisted comment without authentication', async () => {
       // Arrange
       await UsersTableTestHelper.addUser({
-        username: 'userforcommentexample',
-        id: 'user-0001',
+        username: 'testusername',
+        id: 'user-123',
       });
       await ThreadTableTestHelper.addThread({
-        id: 'thread-0000',
+        id: 'thread-123',
         title: 'thread title',
         body: 'thread body',
-        owner: 'user-0001',
+        owner: 'user-123',
       });
       await CommentTableTestHelper.addComment({
-        id: 'comment-0000',
+        id: 'comment-123',
         content: 'comment content',
-        userId: 'user-0001',
-        threadId: 'thread-0000',
+        userId: 'user-123',
+        threadId: 'thread-123',
       });
       const server = await createServer(container);
 
       // Action
       const response = await server.inject({
         method: 'DELETE',
-        url: '/threads/thread-0000/comments/comment-0000',
+        url: '/threads/thread-123/comments/comment-123',
       });
 
       // Assert
@@ -280,7 +280,7 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/users',
         payload: {
-          username: 'userforcommentexample3',
+          username: 'testusername',
           password: 'secret',
           fullname: 'Dicoding Indonesia',
         },
@@ -288,7 +288,7 @@ describe('/threads/{id}/comments endpoint', () => {
       const userId = await users.result.data.addedUser.id;
       // add thread
       await ThreadTableTestHelper.addThread({
-        id: 'thread-0003',
+        id: 'thread-123',
         title: 'thread title',
         body: 'thread body',
         owner: userId,
@@ -298,23 +298,23 @@ describe('/threads/{id}/comments endpoint', () => {
         method: 'POST',
         url: '/authentications',
         payload: {
-          username: 'userforcommentexample3',
+          username: 'testusername',
           password: 'secret',
         },
       });
       const { accessToken } = await user.result.data;
       // add comment
       await CommentTableTestHelper.addComment({
-        id: 'comment-0003',
+        id: 'comment-123',
         content: 'comment content',
         userId,
-        threadId: 'thread-0003',
+        threadId: 'thread-123',
       });
 
       // Action
       const response = await server.inject({
         method: 'DELETE',
-        url: '/threads/thread-0003/comments/comment-0003',
+        url: '/threads/thread-123/comments/comment-123',
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

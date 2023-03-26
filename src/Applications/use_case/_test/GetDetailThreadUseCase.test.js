@@ -216,13 +216,13 @@ describe('GetDetailThreadUseCase', () => {
           id: 'comment-123',
           content: '**komentar telah dihapus**',
           date: expect.any(String),
-          username: 'user-thread-xxx',
+          username: 'user-123',
         },
         {
           id: 'comment-124',
           content: 'some content',
           date: expect.any(String),
-          username: 'user-thread-xxx',
+          username: 'user-123',
         },
       ],
     });
@@ -248,14 +248,14 @@ describe('GetDetailThreadUseCase', () => {
           id: 'comment-123',
           content: 'comment content',
           date: expect.any(String),
-          username: 'user-thread-xxx',
+          username: 'user-123',
           is_delete: true,
         },
         {
           id: 'comment-124',
           content: 'some content',
           date: expect.any(String),
-          username: 'user-thread-xxx',
+          username: 'user-123',
           is_delete: false,
         },
       ]));

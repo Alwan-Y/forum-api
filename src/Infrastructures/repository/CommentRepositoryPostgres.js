@@ -29,7 +29,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
   async findCommentById(id) {
     const query = {
-      text: 'SELECT id, owner, owner FROM comment_threads WHERE id = $1',
+      text: 'SELECT id, owner FROM comment_threads WHERE id = $1',
       values: [id],
     };
 

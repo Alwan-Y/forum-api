@@ -151,7 +151,7 @@ describe('CommentRepository postgres', () => {
   });
 
   describe('findCommentsByThreadId function', () => {
-    it('should return array null if comment thread not found', async () => {
+    it('should return InvariantError if comment thread not found', async () => {
       // Arrange
       const commentRepository = new CommentRepositoryPostgres(pool);
 
@@ -160,6 +160,7 @@ describe('CommentRepository postgres', () => {
     });
 
     it('should return array of comments', async () => {
+      // Arrange
       await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
       await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
       await CommentTableTestHelper.addComment({
@@ -170,8 +171,11 @@ describe('CommentRepository postgres', () => {
       });
 
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action
       const comment = await commentRepositoryPostgres.findCommentByThreadId('thread-123');
 
+      // Assert
       expect(comment).toStrictEqual([
         {
           id: 'comment-123',

@@ -25,123 +25,6 @@ describe('GetDetailThreadUseCase', () => {
       .toThrowError('GET_DETAIL_THREAD_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
-  it('should throw error if use case thread id not found', () => {
-    // Arrange
-    const useCasePayload = {
-      threadId: 'threadId',
-    };
-
-    /** creating dependency of use case */
-    const mockThreadRepository = new ThreadRepository();
-
-    /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(null));
-
-    const getDetailThreadUseCase = new GetDetailThreadUseCase({
-      threadRepository: mockThreadRepository,
-    });
-
-    // Action & Assert
-    expect(() => getDetailThreadUseCase.execute(useCasePayload))
-      .rejects
-      .toThrowError('GET_DETAIL_THREAD_USE_CASE.THREAD_NOT_FOUND');
-    expect(mockThreadRepository.checkThreadById).toHaveBeenCalledWith('threadId');
-  });
-
-  describe('_combineTheradWithCommentAndReplies', () => {
-    it('should map comments when comments exist', async () => {
-      // Arrange
-      const thread = {
-        id: 'thread-id',
-        title: 'title',
-        body: 'body',
-        date: '2022-01-01T00:00:00.000Z',
-        username: 'username',
-      };
-      const comments = [
-        {
-          id: 'comment-id-1',
-          content: 'comment 1',
-          date: '2022-01-02T00:00:00.000Z',
-          username: 'user1',
-          is_delete: false,
-        },
-        {
-          id: 'comment-id-2',
-          content: 'comment 2',
-          date: '2022-01-03T00:00:00.000Z',
-          username: 'user2',
-          is_delete: true,
-        },
-      ];
-
-      const mockRepliesRepository = new RepliesRepository();
-
-      mockRepliesRepository.findRepliesByCommentId = jest.fn()
-        .mockImplementation(() => Promise.resolve([]));
-
-      const useCase = new GetDetailThreadUseCase({
-        threadRepository: null,
-        commentRepository: null,
-        repliesRepository: mockRepliesRepository,
-      });
-
-      // Action
-      const result = await useCase._combineTheradWithComment({ thread, comments });
-
-      // Assert
-      expect(result.id).toEqual(thread.id);
-      expect(result.title).toEqual(thread.title);
-      expect(result.body).toEqual(thread.body);
-      expect(result.date).toEqual(thread.date);
-      expect(result.username).toEqual(thread.username);
-      expect(result.comments).toEqual([
-        {
-          id: comments[0].id,
-          content: comments[0].content,
-          date: comments[0].date,
-          username: comments[0].username,
-          replies: expect.any(Array),
-        },
-        {
-          id: comments[1].id,
-          content: '**komentar telah dihapus**',
-          date: comments[1].date,
-          username: comments[1].username,
-          replies: expect.any(Array),
-        },
-      ]);
-    });
-
-    it('should not map comments when comments is empty', async () => {
-      // Arrange
-      const thread = {
-        id: 'thread-id',
-        title: 'title',
-        body: 'body',
-        date: '2022-01-01T00:00:00.000Z',
-        username: 'username',
-      };
-      const comments = [];
-      const useCase = new GetDetailThreadUseCase({
-        threadRepository: null,
-        commentRepository: null,
-      });
-
-      // Act
-      const result = await useCase._combineTheradWithComment({ thread, comments });
-
-      // Assert
-      expect(result.id).toEqual(thread.id);
-      expect(result.title).toEqual(thread.title);
-      expect(result.body).toEqual(thread.body);
-      expect(result.date).toEqual(thread.date);
-      expect(result.username).toEqual(thread.username);
-      expect(result.comments).toBeUndefined();
-    });
-  });
-
   it('should orchestrating the get detail thread action correctly', async () => {
     // Arrange
     const useCasePayload = {
@@ -178,8 +61,6 @@ describe('GetDetailThreadUseCase', () => {
     const mockRepliesRepository = new RepliesRepository();
 
     /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: 'threadId-123' }));
     mockThreadRepository.getDetailThreadById = jest.fn()
       .mockImplementation(() => Promise.resolve({
         id: 'threadId-123',
@@ -206,7 +87,12 @@ describe('GetDetailThreadUseCase', () => {
         },
       ]));
     mockRepliesRepository.findRepliesByCommentId = jest.fn()
-      .mockImplementation(() => Promise.resolve([]));
+      .mockImplementation(() => Promise.resolve([{
+        id: 'replies-123',
+        date: expect.anything(),
+        content: 'sebuah balasan',
+        username: 'johndoe',
+      }]));
 
     const getDetailThreadUseCase = new GetDetailThreadUseCase({
       threadRepository: mockThreadRepository,
@@ -219,9 +105,111 @@ describe('GetDetailThreadUseCase', () => {
 
     // Assert
     expect(result).toStrictEqual(expectedResult);
-    expect(mockThreadRepository.checkThreadById).toHaveBeenCalledWith('threadId-123');
     expect(mockThreadRepository.getDetailThreadById).toHaveBeenCalledWith('threadId-123');
     expect(mockCommentRepository.findCommentByThreadId).toHaveBeenCalledWith('threadId-123');
     expect(mockCommentRepository.findCommentByThreadId).toHaveBeenCalledWith('threadId-123');
+  });
+
+  it('should map comments to expected format', async () => {
+    // Arrange
+    const comment1 = {
+      id: 'comment-1', content: 'comment content 1', is_delete: false, date: new Date(), username: 'user1',
+    };
+    const comment2 = {
+      id: 'comment-2', content: 'comment content 2', is_delete: true, date: new Date(), username: 'user2',
+    };
+    const comments = [comment1, comment2];
+
+    const reply1 = {
+      id: 'reply-1', content: 'reply content 1', is_delete: false, date: new Date(), username: 'user3',
+    };
+    const reply2 = {
+      id: 'reply-2', content: 'reply content 2', is_delete: true, date: new Date(), username: 'user4',
+    };
+    const replies = [reply1, reply2];
+
+    const repliesRepository = new RepliesRepository();
+    repliesRepository.findRepliesByCommentId = jest.fn().mockReturnValue(replies);
+
+    const getDetailThreadUseCase = new GetDetailThreadUseCase({
+      threadRepository: null,
+      commentRepository: null,
+      repliesRepository,
+    });
+
+    // Act
+    const result = await getDetailThreadUseCase._commentsMapping(comments);
+    // Assert
+    expect(result).toEqual([
+      {
+        id: 'comment-1',
+        content: 'comment content 1',
+        date: expect.anything(),
+        username: 'user1',
+        replies: [
+          {
+            id: 'reply-1',
+            content: 'reply content 1',
+            date: expect.anything(),
+            username: 'user3',
+          },
+          {
+            id: 'reply-2',
+            content: '**komentar telah dihapus**',
+            date: expect.anything(),
+            username: 'user4',
+          },
+        ],
+      },
+      {
+        id: 'comment-2',
+        content: '**komentar telah dihapus**',
+        date: expect.anything(),
+        username: 'user2',
+        replies: [
+          {
+            id: 'reply-1',
+            content: 'reply content 1',
+            date: expect.anything(),
+            username: 'user3',
+          },
+          {
+            id: 'reply-2',
+            content: '**komentar telah dihapus**',
+            date: expect.anything(),
+            username: 'user4',
+          },
+        ],
+      },
+    ]);
+  });
+
+  describe('_combineTheradWithCommentAndReplies', () => {
+    it('should not map comments when comments is empty', async () => {
+      // Arrange
+      const thread = {
+        id: 'thread-id',
+        title: 'title',
+        body: 'body',
+        date: '2022-01-01T00:00:00.000Z',
+        username: 'username',
+      };
+      const comments = [];
+      const useCase = new GetDetailThreadUseCase({
+        threadRepository: null,
+        commentRepository: null,
+      });
+
+      // Act
+      const result = await useCase._combineTheradWithComment({ thread, comments });
+
+      // Assert
+      expect(result.id).toEqual(thread.id);
+      expect(result.title).toEqual(thread.title);
+      expect(result.body).toEqual(thread.body);
+      expect(result.date).toEqual(thread.date);
+      expect(result.username).toEqual(thread.username);
+      expect(result.comments).toBeUndefined();
+    });
   });
 });

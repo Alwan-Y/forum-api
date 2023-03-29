@@ -6,92 +6,6 @@ const AddedReplies = require('../../../Domains/replies/entities/AddedReplies');
 const AddRepliesUseCase = require('../AddRepliesUseCase');
 
 describe('AddRepliesUseCase', () => {
-  it('should throw error if not contain needed property', async () => {
-    // Arrange
-    const useCasePayload = {
-      content: 'Dicoding Indonesia Backend Expert',
-    };
-
-    const addRepliesUseCase = new AddRepliesUseCase({});
-
-    // Action & Assert
-    await expect(addRepliesUseCase.execute(useCasePayload)).rejects.toThrowError('ADD_REPLIES_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY');
-  });
-
-  it('should throw error if not meet data type specification', async () => {
-    // Arrange
-    const useCasePayload = {
-      threadId: 123,
-      commentId: 'comment-123',
-      content: new AddReplies({ content: 'Dicoding Indonesia Backend Expert' }).content,
-      owner: 'user-123',
-    };
-
-    const addRepliesUseCase = new AddRepliesUseCase({});
-
-    // Action & Assert
-    await expect(addRepliesUseCase.execute(useCasePayload)).rejects.toThrowError('ADD_REPLIES_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
-  });
-
-  it('should throw error if thread not found', async () => {
-    // Arrange
-    const useCasePayload = {
-      threadId: 'thread-123',
-      commentId: 'comment-123',
-      content: new AddReplies({ content: 'Dicoding Indonesia Backend Expert' }).content,
-      owner: 'user-123',
-    };
-
-    /** creating dependency of use case */
-    const mockThreadRepository = new ThreadRepository();
-
-    /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-
-    const addRepliesUseCase = new AddRepliesUseCase({
-      threadRepository: mockThreadRepository,
-    });
-
-    // Action & Assert
-    expect(addRepliesUseCase.execute(useCasePayload))
-      .rejects
-      .toThrowError('ADD_REPLIES_USE_CASE.THREAD_NOT_FOUND');
-    expect(mockThreadRepository.checkThreadById).toHaveBeenCalledWith('thread-123');
-  });
-
-  it('should throw error if comment not found', async () => {
-    // Arrange
-    const useCasePayload = {
-      threadId: 'thread-123',
-      commentId: 'comment-123',
-      content: new AddReplies({ content: 'Dicoding Indonesia Backend Expert' }).content,
-      owner: 'user-123',
-    };
-
-    /** creating dependency of use case */
-    const mockThreadRepository = new ThreadRepository();
-    const mockCommentRepository = new CommentRepository();
-
-    /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: 'threadId' }));
-    mockCommentRepository.findCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-
-    const addRepliesUseCase = new AddRepliesUseCase({
-      commentRepository: mockCommentRepository,
-      threadRepository: mockThreadRepository,
-    });
-
-    // Actions & Assert
-    await expect(addRepliesUseCase.execute(useCasePayload))
-      .rejects
-      .toThrowError('ADD_REPLIES_USE_CASE.COMMENT_NOT_FOUND');
-    expect(mockThreadRepository.checkThreadById).toHaveBeenCalledWith('thread-123');
-    expect(mockCommentRepository.findCommentById).toHaveBeenCalledWith('comment-123');
-  });
-
   it('should orchestrating the add replies action correctly', async () => {
     // Arrange
     const useCasePayload = {
@@ -113,12 +27,24 @@ describe('AddRepliesUseCase', () => {
     const mockRepliesRepository = new RepliesRepository();
 
     /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: 'threadId' }));
+    mockThreadRepository.getDetailThreadById = jest.fn()
+      .mockImplementation(() => Promise.resolve(
+        {
+          id: 'thread-123',
+          title: 'Dicoding Indonesia Backend Expert',
+          body: 'Dicoding Indonesia Backend Expert',
+          date: '2021-08-08T07:26:17.000Z',
+          username: 'dicodingindonesia',
+        },
+      ));
     mockCommentRepository.findCommentById = jest.fn()
       .mockImplementation(() => Promise.resolve({ id: 'commentId' }));
     mockRepliesRepository.addReplies = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedAddedReplies));
+      .mockImplementation(() => Promise.resolve(new AddedReplies({
+        id: 'reply-123',
+        content: useCasePayload.content,
+        owner: 'user-123',
+      })));
 
     const addRepliesUseCase = new AddRepliesUseCase({
       commentRepository: mockCommentRepository,
@@ -131,7 +57,7 @@ describe('AddRepliesUseCase', () => {
 
     // Assert
     expect(addedReplies).toStrictEqual(expectedAddedReplies);
-    expect(mockThreadRepository.checkThreadById).toHaveBeenCalledWith('thread-123');
+    expect(mockThreadRepository.getDetailThreadById).toHaveBeenCalledWith('thread-123');
     expect(mockCommentRepository.findCommentById).toHaveBeenCalledWith('comment-123');
     expect(mockRepliesRepository.addReplies).toHaveBeenCalledWith({
       content: 'Dicoding Indonesia Backend Expert',

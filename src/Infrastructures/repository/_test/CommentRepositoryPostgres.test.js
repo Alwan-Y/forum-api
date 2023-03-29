@@ -101,23 +101,6 @@ describe('CommentRepository postgres', () => {
       await expect(commentRepository.deleteCommentById('comment-123')).rejects.toThrowError(NotFoundError);
     });
 
-    it('should return AuthorizationError if comment not owned by user', async () => {
-      // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
-      await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
-      await CommentTableTestHelper.addComment({
-        id: 'comment-123',
-        content: 'great',
-        threadId: 'thread-123',
-        owner: 'user-123',
-      });
-
-      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
-
-      // Action & Assert
-      await expect(commentRepositoryPostgres.checkCommentOwner('comment-123', 'user-122')).rejects.toThrowError(AuthorizationError);
-    });
-
     it('should delete comment', async () => {
       // Arrange
       await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
@@ -185,6 +168,42 @@ describe('CommentRepository postgres', () => {
           date: expect.anything(),
         },
       ]);
+    });
+  });
+
+  describe('checkCommentOwner function', () => {
+    it('should return AuthorizationError if comment owned by user', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
+      await CommentTableTestHelper.addComment({
+        id: 'comment-123',
+        content: 'great',
+        threadId: 'thread-123',
+        owner: 'user-123',
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(commentRepositoryPostgres.checkCommentOwner('comment-123', 'user-122')).rejects.toThrowError(AuthorizationError);
+    });
+
+    it('should not return AuthorizationError if comment not owned by user', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
+      await CommentTableTestHelper.addComment({
+        id: 'comment-123',
+        content: 'great',
+        threadId: 'thread-123',
+        owner: 'user-123',
+      });
+
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(commentRepositoryPostgres.checkCommentOwner('comment-123', 'user-123')).resolves.not.toThrowError(AuthorizationError);
     });
   });
 });

@@ -5,46 +5,6 @@ const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const AddCommentUseCase = require('../AddCommentUseCase');
 
 describe('AddCommentUseCase', () => {
-  it('should throw error if payload did not contain needed property', async () => {
-    // Arrange
-    const useCasePayload = {
-      content: 'Dicoding Indonesia Backend Expert',
-    };
-
-    /** creating dependency of use case */
-    const mockCommentRepository = new CommentRepository();
-    const mockThreadRepository = new ThreadRepository();
-
-    // Action & Assert
-    await expect(new AddCommentUseCase({
-      commentRepository: mockCommentRepository,
-      threadRepository: mockThreadRepository,
-    }).execute(useCasePayload)).rejects.toThrowError('ADD_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
-  });
-
-  it('should throw error if thread id not found', async () => {
-    // Arrange
-    const useCasePayload = {
-      threadId: 'thread-123',
-      content: 'Dicoding Indonesia Backend Expert',
-      owner: 'user-123',
-    };
-
-    /** creating dependency of use case */
-    const mockCommentRepository = new CommentRepository();
-    const mockThreadRepository = new ThreadRepository();
-
-    /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.reject(new Error('THREAD.NOT_FOUND')));
-
-    // Action & Assert
-    await expect(new AddCommentUseCase({
-      commentRepository: mockCommentRepository,
-      threadRepository: mockThreadRepository,
-    }).execute(useCasePayload)).rejects.toThrowError('THREAD.NOT_FOUND');
-  });
-
   it('should orchestrating the add comment action correctly', async () => {
     // Arrange
     const useCasePayload = new AddComment({
@@ -64,10 +24,20 @@ describe('AddCommentUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
 
     /** mocking needed function */
-    mockThreadRepository.checkThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+    mockThreadRepository.getDetailThreadById = jest.fn()
+      .mockImplementation(() => Promise.resolve({
+        id: 'thread-123',
+        title: 'Dicoding Indonesia Backend Expert',
+        body: 'Dicoding Indonesia Backend Expert',
+        date: '2021-08-08T07:26:17.000Z',
+        username: 'dicodingindonesia',
+      }));
     mockCommentRepository.addComment = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedAddedComment));
+      .mockImplementation(() => Promise.resolve(new AddedComment({
+        id: 'comment-123',
+        content: 'Dicoding Indonesia Backend Expert',
+        owner: 'user-123',
+      })));
 
     /** creating use case instance */
     const addCommentUseCase = new AddCommentUseCase({

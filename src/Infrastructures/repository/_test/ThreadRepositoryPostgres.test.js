@@ -3,7 +3,7 @@ const pool = require('../../database/postgres/pool');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
-const InvariantError = require('../../../Commons/exceptions/InvariantError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 
 describe('ThreadRepository postgres', () => {
   afterEach(async () => {
@@ -59,26 +59,6 @@ describe('ThreadRepository postgres', () => {
     });
   });
 
-  describe('checkThreadByTitle function', () => {
-    it('should throw InvariantError when thread tittle exist', async () => {
-      // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
-      await ThreadTableTestHelper.addThread({ title: 'Backend Expert', body: 'How To Learn Backend Expert', owner: 'user-123' });
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-
-      // Action & Assert
-      await expect(threadRepositoryPostgres.checkThreadByTitle('Backend Expert')).rejects.toThrowError(InvariantError);
-    });
-
-    it('should not throw InvariantError when thread tittle not exist', async () => {
-      // Arrange
-      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
-
-      // Action & Assert
-      await expect(threadRepositoryPostgres.checkThreadByTitle('Backend Expert')).resolves.not.toThrowError(InvariantError);
-    });
-  });
-
   describe('getDetailThreadById', () => {
     it('should return detail thread correctly', async () => {
       // Arrange
@@ -104,7 +84,7 @@ describe('ThreadRepository postgres', () => {
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
       // Action & Assert
-      await expect(threadRepositoryPostgres.getDetailThreadById('thread-123')).rejects.toThrowError(InvariantError);
+      await expect(threadRepositoryPostgres.getDetailThreadById('thread-123')).rejects.toThrowError(NotFoundError);
     });
   });
 });

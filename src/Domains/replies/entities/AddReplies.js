@@ -8,11 +8,11 @@ class AddReplies {
 
   _verifyPayload({ content }) {
     if (!content) {
-      throw new Error('ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
+      throw new Error('ADD_REPLIES.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
     if (typeof content !== 'string') {
-      throw new Error('ADD_REPLY.NOT_MEET_DATA_TYPE_SPECIFICATION');
+      throw new Error('ADD_REPLIES.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }
 }

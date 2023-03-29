@@ -68,10 +68,8 @@ class RepliesRepositoryPostgres extends RepliesRepository {
         SELECT 
           replies.id, 
           replies.created_at as date, 
-          case 
-              when replies.is_delete = true then '**balasan telah dihapus**'
-              when replies.is_delete = false then replies.content
-          end as content,
+          replies.content,
+          replies.is_delete,
           users.username
         FROM replies
         LEFT JOIN users ON users.id = replies.owner

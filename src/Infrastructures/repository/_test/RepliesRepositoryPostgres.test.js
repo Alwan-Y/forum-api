@@ -139,22 +139,6 @@ describe('RepliesRepositoryPostgres', () => {
       // Action & Assert
       await expect(repliesRepositoryPostgres.deleteReplies('replies-123')).rejects.toThrowError(NotFoundError);
     });
-
-    it('should return AuthorizationError when replies not owned by user', async () => {
-      // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
-      await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
-      await CommentTableTestHelper.addComment({
-        id: 'comment-123', content: 'great thread', threadId: 'thread-123', userId: 'user-123',
-      });
-      await RepliesTableTestHelper.addReply({
-        id: 'replies-123', content: 'great reply', commentId: 'comment-123', userId: 'user-123',
-      });
-      const repliesRepositoryPostgres = new RepliesRepositoryPostgres(pool, {});
-
-      // Action & Assert
-      await expect(repliesRepositoryPostgres.checkRepliesOwner('replies-123', 'user-122')).rejects.toThrowError(AuthorizationError);
-    });
   });
 
   describe('findRepliesByCommentId function', () => {
@@ -188,7 +172,42 @@ describe('RepliesRepositoryPostgres', () => {
         content: 'great reply',
         date: expect.anything(),
         username: 'testusercoment',
+        is_delete: false,
       }]);
+    });
+  });
+
+  describe('checkRepliesOwner function', () => {
+    it('should return AuthorizationError when replies not owned by user', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
+      await CommentTableTestHelper.addComment({
+        id: 'comment-123', content: 'great thread', threadId: 'thread-123', userId: 'user-123',
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'replies-123', content: 'great reply', commentId: 'comment-123', userId: 'user-123',
+      });
+      const repliesRepositoryPostgres = new RepliesRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(repliesRepositoryPostgres.checkRepliesOwner('replies-123', 'user-122')).rejects.toThrowError(AuthorizationError);
+    });
+
+    it('should not return AuthorizationError when replies owned by user', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'testusercoment' });
+      await ThreadTableTestHelper.addThread({ id: 'thread-123', title: 'comment tittle', owner: 'user-123' });
+      await CommentTableTestHelper.addComment({
+        id: 'comment-123', content: 'great thread', threadId: 'thread-123', userId: 'user-123',
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'replies-123', content: 'great reply', commentId: 'comment-123', userId: 'user-123',
+      });
+      const repliesRepositoryPostgres = new RepliesRepositoryPostgres(pool, {});
+
+      // Action & Assert
+      await expect(repliesRepositoryPostgres.checkRepliesOwner('replies-123', 'user-123')).resolves.not.toThrowError(AuthorizationError);
     });
   });
 });

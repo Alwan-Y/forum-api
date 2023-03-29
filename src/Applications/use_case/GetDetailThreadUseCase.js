@@ -28,12 +28,6 @@ class GetDetailThreadUseCase {
     if (typeof threadId !== 'string') {
       throw new Error('GET_DETAIL_THREAD_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
-
-    const result = await this._threadRepository.checkThreadById(threadId);
-
-    if (!result) {
-      throw new Error('GET_DETAIL_THREAD_USE_CASE.THREAD_NOT_FOUND');
-    }
   }
 
   async _combineTheradWithComment({ thread, comments }) {
@@ -52,24 +46,22 @@ class GetDetailThreadUseCase {
     return result;
   }
 
-  // async _commentsMapping(comments) {
-  //   return comments.map((comment) => ({
-  //     id: comment.id,
-  //     content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
-  //     date: comment.date,
-  //     username: comment.username,
-  //   }));
-  // }
-
   async _commentsMapping(comments) {
-    const commentPromises = comments.map(async (comment) => ({
-      id: comment.id,
-      content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
-      date: comment.date,
-      username: comment.username,
-      replies: await this._repliesRepository.findRepliesByCommentId(comment.id),
-    }));
-
+    const commentPromises = comments.map(async (comment) => {
+      const replies = await this._repliesRepository.findRepliesByCommentId(comment.id);
+      return {
+        id: comment.id,
+        content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
+        date: comment.date,
+        username: comment.username,
+        replies: replies.map((reply) => ({
+          id: reply.id,
+          content: reply.is_delete ? '**komentar telah dihapus**' : reply.content,
+          date: reply.date,
+          username: reply.username, // add a comma after this property
+        })),
+      };
+    });
     return Promise.all(commentPromises);
   }
 }

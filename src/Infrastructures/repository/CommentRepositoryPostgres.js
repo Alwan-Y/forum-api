@@ -61,8 +61,6 @@ class CommentRepositoryPostgres extends CommentRepository {
     if (owner !== ownerComent) {
       throw new AuthorizationError('Anda tidak berhak mengakses resource ini');
     }
-
-    return true;
   }
 
   async findCommentByThreadId(threadId) {

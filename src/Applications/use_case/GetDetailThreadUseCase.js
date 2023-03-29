@@ -56,7 +56,7 @@ class GetDetailThreadUseCase {
         username: comment.username,
         replies: replies.map((reply) => ({
           id: reply.id,
-          content: reply.is_delete ? '**komentar telah dihapus**' : reply.content,
+          content: reply.is_delete ? '**balasan telah dihapus**' : reply.content,
           date: reply.date,
           username: reply.username, // add a comma after this property
         })),

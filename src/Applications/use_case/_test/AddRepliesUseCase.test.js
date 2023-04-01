@@ -38,7 +38,7 @@ describe('AddRepliesUseCase', () => {
         },
       ));
     mockCommentRepository.findCommentById = jest.fn()
-      .mockImplementation(() => Promise.resolve({ id: 'commentId' }));
+      .mockImplementation(() => Promise.resolve({ id: 'commentId', owner: 'user-123' }));
     mockRepliesRepository.addReplies = jest.fn()
       .mockImplementation(() => Promise.resolve(new AddedReplies({
         id: 'reply-123',

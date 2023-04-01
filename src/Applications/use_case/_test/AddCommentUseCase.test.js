@@ -50,6 +50,7 @@ describe('AddCommentUseCase', () => {
 
     // Assert
     expect(response).toStrictEqual(expectedAddedComment);
+    expect(mockThreadRepository.getDetailThreadById).toBeCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.addComment).toBeCalledWith(useCasePayload);
   });
 });

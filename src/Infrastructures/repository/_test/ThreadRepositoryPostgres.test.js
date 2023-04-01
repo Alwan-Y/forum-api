@@ -66,6 +66,8 @@ describe('ThreadRepository postgres', () => {
       await ThreadTableTestHelper.addThread({ title: 'Backend Expert', body: 'How To Learn Backend Expert', owner: 'user-123' });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
+      const dateThread = await ThreadTableTestHelper.findThread('thread-123');
+
       // Action
       const thread = await threadRepositoryPostgres.getDetailThreadById('thread-123');
 
@@ -75,7 +77,7 @@ describe('ThreadRepository postgres', () => {
         title: 'Backend Expert',
         body: 'How To Learn Backend Expert',
         username: 'dicoding',
-        date: expect.anything(),
+        date: dateThread[0].created_at,
       });
     });
 

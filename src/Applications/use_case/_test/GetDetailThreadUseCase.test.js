@@ -35,20 +35,20 @@ describe('GetDetailThreadUseCase', () => {
       id: 'threadId-123',
       title: 'title',
       body: 'body',
-      date: expect.any(String),
+      date: '2021-08-08T07:26:17.018Z',
       username: 'dicoding',
       comments: [
         {
           id: 'comment-123',
           content: '**komentar telah dihapus**',
-          date: expect.any(String),
+          date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
           replies: expect.any(Array),
         },
         {
           id: 'comment-124',
           content: 'some content',
-          date: expect.any(String),
+          date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
           replies: expect.any(Array),
         },
@@ -74,14 +74,14 @@ describe('GetDetailThreadUseCase', () => {
         {
           id: 'comment-123',
           content: 'comment content',
-          date: expect.any(String),
+          date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
           is_delete: true,
         },
         {
           id: 'comment-124',
           content: 'some content',
-          date: expect.any(String),
+          date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
           is_delete: false,
         },
@@ -107,7 +107,8 @@ describe('GetDetailThreadUseCase', () => {
     expect(result).toStrictEqual(expectedResult);
     expect(mockThreadRepository.getDetailThreadById).toHaveBeenCalledWith('threadId-123');
     expect(mockCommentRepository.findCommentByThreadId).toHaveBeenCalledWith('threadId-123');
-    expect(mockCommentRepository.findCommentByThreadId).toHaveBeenCalledWith('threadId-123');
+    expect(mockRepliesRepository.findRepliesByCommentId).toHaveBeenCalledWith('comment-123');
+    expect(mockRepliesRepository.findRepliesByCommentId).toHaveBeenCalledWith('comment-124');
   });
 
   it('should map comments to expected format', async () => {
@@ -155,7 +156,7 @@ describe('GetDetailThreadUseCase', () => {
           },
           {
             id: 'reply-2',
-            content: '**komentar telah dihapus**',
+            content: '**balasan telah dihapus**',
             date: expect.anything(),
             username: 'user4',
           },
@@ -175,7 +176,7 @@ describe('GetDetailThreadUseCase', () => {
           },
           {
             id: 'reply-2',
-            content: '**komentar telah dihapus**',
+            content: '**balasan telah dihapus**',
             date: expect.anything(),
             username: 'user4',
           },
@@ -210,6 +211,71 @@ describe('GetDetailThreadUseCase', () => {
       expect(result.date).toEqual(thread.date);
       expect(result.username).toEqual(thread.username);
       expect(result.comments).toBeUndefined();
+    });
+  });
+
+  describe('GetDetailThreadUseCase', () => {
+    it('returns a GetThread object with the correct properties', async () => {
+      // Arrange
+      const threadRepository = {
+        getDetailThreadById: jest.fn().mockResolvedValue({
+          id: 'thread-123',
+          title: 'Test Thread',
+          body: 'This is a test thread',
+          date: '2023-04-02T12:00:00Z',
+          username: 'testuser',
+        }),
+      };
+      const commentRepository = {
+        findCommentByThreadId: jest.fn().mockResolvedValue([
+          {
+            id: 'comment-1',
+            content: 'This is a comment',
+            date: '2023-04-02T12:01:00Z',
+            username: 'testuser',
+            is_delete: false,
+          },
+        ]),
+      };
+      const repliesRepository = {
+        findRepliesByCommentId: jest.fn().mockResolvedValue([
+          {
+            id: 'reply-1',
+            content: 'This is a reply',
+            date: '2023-04-02T12:02:00Z',
+            username: 'testuser',
+            is_delete: false,
+          },
+        ]),
+      };
+      const getDetailThreadUseCase = new GetDetailThreadUseCase({
+        threadRepository,
+        commentRepository,
+        repliesRepository,
+      });
+
+      // Act
+      const result = await getDetailThreadUseCase.execute({ threadId: 'thread-123' });
+
+      // Assert
+      expect(result).toBeInstanceOf(GetThread);
+      expect(result.id).toBe('thread-123');
+      expect(result.title).toBe('Test Thread');
+      expect(result.body).toBe('This is a test thread');
+      expect(result.date).toBe('2023-04-02T12:00:00Z');
+      expect(result.username).toBe('testuser');
+      expect(result.comments).toBeDefined();
+      expect(result.comments).toHaveLength(1);
+      expect(result.comments[0].id).toBe('comment-1');
+      expect(result.comments[0].content).toBe('This is a comment');
+      expect(result.comments[0].date).toBe('2023-04-02T12:01:00Z');
+      expect(result.comments[0].username).toBe('testuser');
+      expect(result.comments[0].replies).toBeDefined();
+      expect(result.comments[0].replies).toHaveLength(1);
+      expect(result.comments[0].replies[0].id).toBe('reply-1');
+      expect(result.comments[0].replies[0].content).toBe('This is a reply');
+      expect(result.comments[0].replies[0].date).toBe('2023-04-02T12:02:00Z');
+      expect(result.comments[0].replies[0].username).toBe('testuser');
     });
   });
 });

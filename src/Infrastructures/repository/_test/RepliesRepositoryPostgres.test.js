@@ -164,13 +164,14 @@ describe('RepliesRepositoryPostgres', () => {
       });
       const repliesRepositoryPostgres = new RepliesRepositoryPostgres(pool, {});
 
+      const dateReplies = await RepliesTableTestHelper.findReply('replies-123');
       // Action
       const replies = await repliesRepositoryPostgres.findRepliesByCommentId('comment-123');
       // Assert
       expect(replies).toStrictEqual([{
         id: 'replies-123',
         content: 'great reply',
-        date: expect.anything(),
+        date: dateReplies[0].created_at,
         username: 'testusercoment',
         is_delete: false,
       }]);

@@ -13,6 +13,7 @@ class GetDetailThreadUseCase {
 
     const thread = await this._threadRepository.getDetailThreadById(threadId);
     const comments = await this._commentRepository.findCommentByThreadId(threadId);
+
     const result = await this._combineTheradWithComment({ thread, comments });
 
     return new GetThread(result);

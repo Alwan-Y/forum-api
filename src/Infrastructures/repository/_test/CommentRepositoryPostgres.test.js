@@ -153,6 +153,7 @@ describe('CommentRepository postgres', () => {
         owner: 'user-123',
       });
 
+      const dateComent = await CommentTableTestHelper.findComment('comment-123');
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
       // Action
@@ -165,7 +166,7 @@ describe('CommentRepository postgres', () => {
           content: 'great',
           username: 'testusercoment',
           is_delete: false,
-          date: expect.anything(),
+          date: dateComent[0].created_at,
         },
       ]);
     });

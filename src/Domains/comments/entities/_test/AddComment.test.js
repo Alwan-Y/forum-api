@@ -29,6 +29,6 @@ describe('AddComment entities', () => {
     const addComment = new AddComment(payload);
 
     expect(addComment).toBeInstanceOf(AddComment);
-    expect(addComment.content).toEqual(payload.content);
+    expect(addComment).toEqual(payload);
   });
 });

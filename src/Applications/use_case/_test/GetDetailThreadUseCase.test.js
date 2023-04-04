@@ -166,8 +166,6 @@ describe('GetDetailThreadUseCase', () => {
       // Act
       const result = await useCase._combineTheradWithComment({ thread, comments });
 
-      console.log(result)
-
       // Assert
       expect(result).toEqual({
         id: 'thread-id',

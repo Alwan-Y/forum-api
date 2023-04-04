@@ -39,10 +39,8 @@ class GetDetailThreadUseCase {
       date: thread.date,
       username: thread.username,
     };
-    /* istanbul ignore next */
-    if (comments.length > 0) {
-      result.comments = await this._commentsMapping(comments);
-    }
+
+    result.comments = await this._commentsMapping(comments);
 
     return result;
   }
@@ -57,7 +55,7 @@ class GetDetailThreadUseCase {
         username: comment.username,
         replies: replies.map((reply) => ({
           id: reply.id,
-          content: /* istanbul ignore next */ reply.is_delete ? '**balasan telah dihapus**' : reply.content,
+          content: reply.is_delete ? '**balasan telah dihapus**' : reply.content,
           date: reply.date,
           username: reply.username,
         })),

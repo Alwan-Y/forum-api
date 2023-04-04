@@ -89,9 +89,10 @@ describe('GetDetailThreadUseCase', () => {
     mockRepliesRepository.findRepliesByCommentId = jest.fn()
       .mockImplementation(() => Promise.resolve([{
         id: 'replies-123',
-        date: expect.anything(),
+        date: '2021-08-08T07:26:17.018Z',
         content: 'sebuah balasan',
         username: 'johndoe',
+        is_delete: false,
       }]));
 
     const getDetailThreadUseCase = new GetDetailThreadUseCase({
@@ -109,5 +110,117 @@ describe('GetDetailThreadUseCase', () => {
     expect(mockCommentRepository.findCommentByThreadId).toHaveBeenCalledWith('threadId-123');
     expect(mockRepliesRepository.findRepliesByCommentId).toHaveBeenCalledWith('comment-123');
     expect(mockRepliesRepository.findRepliesByCommentId).toHaveBeenCalledWith('comment-124');
+  });
+
+  describe('_combineTheradWithComment', () => {
+    it('should combine thread with comments', async () => {
+      // Arrange
+      const thread = {
+        id: 'thread-id',
+        title: 'Thread Title',
+        body: 'Thread Body',
+        date: new Date(),
+        username: 'username',
+      };
+      const comments = [
+        {
+          id: 'comment-id-1',
+          content: 'Comment Content 1',
+          is_delete: false,
+          date: new Date(),
+          username: 'username1',
+        },
+        {
+          id: 'comment-id-2',
+          content: 'Comment Content 2',
+          is_delete: true,
+          date: new Date(),
+          username: 'username2',
+        },
+      ];
+      const replies = [
+        {
+          id: 'reply-id-1',
+          content: 'Reply Content 1',
+          is_delete: false,
+          date: new Date(),
+          username: 'username1',
+        },
+        {
+          id: 'reply-id-2',
+          content: 'Reply Content 2',
+          is_delete: true,
+          date: new Date(),
+          username: 'username2',
+        },
+      ];
+      const repliesRepository = {
+        findRepliesByCommentId: jest.fn().mockResolvedValue(replies),
+      };
+      const useCase = new GetDetailThreadUseCase({
+        threadRepository: null,
+        commentRepository: null,
+        repliesRepository,
+      });
+
+      // Act
+      const result = await useCase._combineTheradWithComment({ thread, comments });
+
+      console.log(result)
+
+      // Assert
+      expect(result).toEqual({
+        id: 'thread-id',
+        title: 'Thread Title',
+        body: 'Thread Body',
+        date: thread.date,
+        username: 'username',
+        comments: [
+          {
+            id: 'comment-id-1',
+            content: 'Comment Content 1',
+            date: comments[0].date,
+            username: 'username1',
+            replies: [
+              {
+                id: 'reply-id-1',
+                content: 'Reply Content 1',
+                date: replies[0].date,
+                username: 'username1',
+              },
+              {
+                content: '**balasan telah dihapus**',
+                date: replies[1].date,
+                id: 'reply-id-2',
+                username: 'username2',
+              },
+            ],
+          },
+          {
+            id: 'comment-id-2',
+            content: '**komentar telah dihapus**',
+            date: comments[1].date,
+            username: 'username2',
+            replies: [
+              {
+                id: 'reply-id-1',
+                content: 'Reply Content 1',
+                date: replies[0].date,
+                username: 'username1',
+              },
+              {
+                id: 'reply-id-2',
+                content: '**balasan telah dihapus**',
+                date: replies[1].date,
+                username: 'username2',
+              },
+            ],
+          },
+        ],
+      });
+      expect(repliesRepository.findRepliesByCommentId).toHaveBeenCalledTimes(2);
+      expect(repliesRepository.findRepliesByCommentId).toHaveBeenNthCalledWith(1, 'comment-id-1');
+      expect(repliesRepository.findRepliesByCommentId).toHaveBeenNthCalledWith(2, 'comment-id-2');
+    });
   });
 });

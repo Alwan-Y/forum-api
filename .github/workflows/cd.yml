@@ -21,4 +21,4 @@
               git pull origin master
               npm install
               npm run migrate up
-              pm2 restart auth-api
+              pm2 restart forum-api

@@ -1,5 +1,7 @@
-node_modules
-package-lock.json
 .idea
-config/database/test.json
+node_modules
+.env
+package-lock.json
+key-learnCICD.pem
 coverage
+config/database/test.json

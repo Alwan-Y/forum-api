@@ -167,6 +167,7 @@ describe('CommentRepository postgres', () => {
           username: 'testusercoment',
           is_delete: false,
           date: dateComent[0].created_at,
+          likecount: '0',
         },
       ]);
     });

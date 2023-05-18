@@ -49,6 +49,10 @@ DomainErrorTranslator._directories = {
   'DELETE_REPLIES_USE_CASE.REPLIES_NOT_FOUND': new NotFoundError('REPLIES tidak ditemukan'),
   'DELETE_REPLIES_USE_CASE.NOT_CONTAIN_REPLIES_ID': new InvariantError('harus mengirimkan id REPLIES'),
   'DELETE_REPLIES_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('id REPLIES harus string'),
+  'LIKES_COMMENT_USE_CASE.NOT_CONTAIN_NEEDED_PROPERTY': new InvariantError('harus mengirimkan id comment'),
+  'LIKES_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION': new InvariantError('id comment harus string'),
+  'LIKES_COMMENT_USE_CASE.COMMENT_NOT_FOUND': new NotFoundError('comment tidak ditemukan'),
+  'LIKES_COMMENT_USE_CASE.THREAD_NOT_FOUND': new NotFoundError('thread tidak ditemukan'),
 };
 
 module.exports = DomainErrorTranslator;

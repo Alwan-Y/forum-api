@@ -43,6 +43,7 @@ describe('GetDetailThreadUseCase', () => {
           content: '**komentar telah dihapus**',
           date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
+          likeCount: 0,
           replies: expect.any(Array),
         },
         {
@@ -50,6 +51,7 @@ describe('GetDetailThreadUseCase', () => {
           content: 'some content',
           date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
+          likeCount: 0,
           replies: expect.any(Array),
         },
       ],
@@ -76,6 +78,7 @@ describe('GetDetailThreadUseCase', () => {
           content: 'comment content',
           date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
+          likecount: 0,
           is_delete: true,
         },
         {
@@ -83,6 +86,7 @@ describe('GetDetailThreadUseCase', () => {
           content: 'some content',
           date: '2021-08-08T07:26:17.018Z',
           username: 'user-123',
+          likecount: 0,
           is_delete: false,
         },
       ]));
@@ -128,6 +132,7 @@ describe('GetDetailThreadUseCase', () => {
           content: 'Comment Content 1',
           is_delete: false,
           date: new Date(),
+          likecount: 0,
           username: 'username1',
         },
         {
@@ -135,6 +140,7 @@ describe('GetDetailThreadUseCase', () => {
           content: 'Comment Content 2',
           is_delete: true,
           date: new Date(),
+          likecount: 0,
           username: 'username2',
         },
       ];
@@ -179,6 +185,7 @@ describe('GetDetailThreadUseCase', () => {
             content: 'Comment Content 1',
             date: comments[0].date,
             username: 'username1',
+            likeCount: 0,
             replies: [
               {
                 id: 'reply-id-1',
@@ -199,6 +206,7 @@ describe('GetDetailThreadUseCase', () => {
             content: '**komentar telah dihapus**',
             date: comments[1].date,
             username: 'username2',
+            likeCount: 0,
             replies: [
               {
                 id: 'reply-id-1',

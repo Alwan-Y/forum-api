@@ -53,6 +53,7 @@ class GetDetailThreadUseCase {
         content: comment.is_delete ? '**komentar telah dihapus**' : comment.content,
         date: comment.date,
         username: comment.username,
+        likeCount: Number(comment.likecount),
         replies: replies.map((reply) => ({
           id: reply.id,
           content: reply.is_delete ? '**balasan telah dihapus**' : reply.content,

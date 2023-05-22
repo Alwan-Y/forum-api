@@ -27,7 +27,7 @@ describe('LikesCommentUseCase', () => {
     // Action & Assert
     expect(() => likesCommentUseCase.execute(useCasePayload))
       .rejects
-      .toThrowError('LIKE_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
+      .toThrowError('LIKE_COMMENT_USE_CASE.NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
   it('should throw error if thread not found', async () => {
